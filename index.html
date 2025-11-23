@@ -8,6 +8,11 @@
         /* Global Reset and Premium Font */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         
+        /* 🛠️ FIX 1: Set HTML and Body to full height to ensure 100vh works properly */
+        html, body {
+            height: 100%; /* Ensure full height from the root */
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -120,18 +125,15 @@
         .chat-header h4 {
             font-weight: 600;
             color: #FFC300;
-            /* Added for mobile: reduces font size slightly for space */
             font-size: 18px; 
         }
 
         .user-info {
             font-size: 14px;
             color: #AAB7B8;
-            /* Added for mobile: Hides full email for space */
             display: block; 
         }
 
-        /* Hide full email address on mobile header (will show only email part) */
         .chat-header .user-info #userEmail {
              display: none;
         }
@@ -145,7 +147,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.3s;
-            /* Added for mobile: reduces font size */
             font-size: 12px;
         }
 
@@ -177,7 +178,6 @@
             margin-bottom: 10px;
             max-width: 80%;
         }
-        /* (message-line.sent/received styles remain the same) */
 
         .message-line.sent {
             margin-left: auto;
@@ -284,71 +284,83 @@
         /* ======================================= */
         @media (max-width: 600px) {
             
-            /* 1. Chat Container becomes Parent Container (Full Screen) */
+            /* 🛠️ FIX 2: Main Chat Container Height Fix */
             .chat-container {
-                width: 100vw; /* Full width */
+                width: 100vw;
                 max-width: 100vw;
-                height: 100vh; /* Full height for mobile experience */
-                border-radius: 0; /* Remove border radius for full screen look */
-                box-shadow: none; /* Remove shadow */
+                /* FIX APPLIED: height ko 100vh se badal kar 100% kiya. 
+                   Kyunki html, body 100% hain, ab yeh available screen height lega. */
+                ;
+                margin-top: 0;
+                border-radius: 0; 
+                box-shadow: none; 
+                /* Optional: Agar ab bhi scroll ho, toh yeh line use kar sakte hain. 
+                   height: 100dvh; 
+                   dvh (Dynamic Viewport Height) modern browsers mein sabse achha fix hai. 
+                   Lekin 100% kaafi hona chahiye.
+                */
+                /* height: 100vh; */
             }
 
-            /* 2. Auth Area Stacked (Single Column) */
+            /* 🛠️ FIX 3: Add flex-grow to messages to ensure it takes remaining space */
+            #messages {
+                flex-grow: 1; /* This is already present, ensuring it takes all available middle space */
+                /* Adjust padding */
+                padding: 15px; ;
+            }
+
+            /* Auth Area Stacked */
             .auth-area {
-                flex-direction: column; /* Stack cards vertically */
+                flex-direction: column; 
                 padding: 20px;
-                overflow-y: auto; /* Allow scrolling if content overflows */
+                overflow-y: auto;
             }
 
-            /* 3. Auth Cards Styling */
+            /* Auth Cards Styling */
             .auth-card {
-                max-width: 100%; /* Take full available width */
-                margin: 15px 0; /* Add space between stacked cards */
+                max-width: 100%; 
+                margin: 15px 0; 
                 padding: 25px;
             }
 
-            /* 4. Chat Header Compact */
+            /* Chat Header Compact */
             .chat-header {
-                padding: 10px 15px; /* Reduce padding */
+                padding: 10px 15px; 
             }
 
             .chat-header h4 {
-                font-size: 16px; /* Smaller title */
+                font-size: 16px;
                 margin-right: 10px;
             }
 
             .user-info {
                 font-size: 12px;
-                /* Displaying only the first part of email for space */
                 display: none; 
             }
 
             .logout-button {
-                padding: 6px 12px; /* Smaller button */
+                padding: 6px 12px; 
                 font-size: 11px;
             }
 
-            /* 5. Messages Area */
-            #messages {
-                padding: 15px; /* Reduced padding */
-            }
-
+            /* Messages Area */
             .message-line {
-                max-width: 90%; /* Messages can take more width */
+                max-width: 90%; 
             }
 
-            /* 6. Chat Input Compact */
+            /* Chat Input Compact */
             .chat-input {
-                padding: 10px 15px; /* Reduced padding */
+                padding: 10px 15px; 
             }
 
             .chat-input input {
-                padding: 10px 15px; /* Smaller input field */
+                padding: 10px 15px; 
                 margin-right: 10px;
+                width: 30%;
             }
 
             .send-button {
-                width: 40px; /* Smaller send button */
+                width: 40px; 
                 height: 40px;
                 font-size: 16px;
             }
