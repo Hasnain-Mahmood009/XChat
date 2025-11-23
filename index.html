@@ -29,11 +29,12 @@
             overflow: hidden;
         }
 
-        /* --- Main Layout: Chat Container for Single Room --- */
+        /* --- DESKTOP Layout (Default: 900px max-width) --- */
         .chat-container {
             width: 95%;
-            max-width: 900px; /* Wider for group chat experience */
-            height: 90vh;
+            max-width: 900px; /* Desktop width */
+            height: 90vh; /* Desktop height */
+            margin: auto; /* Centering */
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 15px 40px rgba(28, 40, 51, 0.2);
@@ -42,7 +43,7 @@
             flex-direction: column;
         }
 
-        /* --- Auth/Login Area (Initially visible) --- */
+        /* --- Auth/Login Area (Desktop View) --- */
         .auth-area {
             display: flex;
             justify-content: center;
@@ -83,7 +84,7 @@
         .auth-card button {
             width: 100%;
             padding: 12px;
-            background: #1C2833; /* Dark Navy Button */
+            background: #1C2833; 
             color: #FFFFFF;
             border: none;
             border-radius: 6px;
@@ -94,13 +95,13 @@
         }
 
         .auth-card button:hover {
-            background: #FFC300; /* Gold Hover */
+            background: #FFC300; 
             color: #1C2833;
         }
 
-        /* --- Chat Area (Initially hidden) --- */
+        /* --- Chat Area (Common/Desktop) --- */
         .chat-area {
-            display: none; /* Initial state hidden by JS */
+            display: none; 
             flex-direction: column;
             flex-grow: 1;
             overflow: hidden;
@@ -108,22 +109,31 @@
 
         .chat-header {
             padding: 15px 25px;
-            border-bottom: 3px solid #FFC300; /* Stronger Gold Divider */
+            border-bottom: 3px solid #FFC300; 
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1C2833; /* Dark Navy Header */
+            background: #1C2833; 
             color: #F4F6F7;
         }
 
         .chat-header h4 {
             font-weight: 600;
             color: #FFC300;
+            /* Added for mobile: reduces font size slightly for space */
+            font-size: 18px; 
         }
 
         .user-info {
             font-size: 14px;
             color: #AAB7B8;
+            /* Added for mobile: Hides full email for space */
+            display: block; 
+        }
+
+        /* Hide full email address on mobile header (will show only email part) */
+        .chat-header .user-info #userEmail {
+             display: none;
         }
         
         .logout-button {
@@ -135,6 +145,8 @@
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.3s;
+            /* Added for mobile: reduces font size */
+            font-size: 12px;
         }
 
         .logout-button:hover {
@@ -142,12 +154,12 @@
         }
 
 
-        /* --- Message Display Area (messagesDiv in JS) --- */
+        /* --- Message Display Area --- */
         #messages {
             flex-grow: 1;
             padding: 20px 25px;
             overflow-y: auto;
-            background: #F4F6F7; /* Light background for chat history */
+            background: #F4F6F7; 
         }
 
         #messages::-webkit-scrollbar {
@@ -165,6 +177,7 @@
             margin-bottom: 10px;
             max-width: 80%;
         }
+        /* (message-line.sent/received styles remain the same) */
 
         .message-line.sent {
             margin-left: auto;
@@ -188,13 +201,13 @@
         }
         
         .message-line.sent .message-content {
-            background: #FFC300; /* Sent - Gold Accent Bubble */
+            background: #FFC300; 
             color: #1C2833;
             border-bottom-right-radius: 5px;
         }
 
         .message-line.received .message-content {
-            background: #FFFFFF; /* Received - White Bubble */
+            background: #FFFFFF; 
             color: #1C2833;
             border: 1px solid #EAECEE;
             border-bottom-left-radius: 5px;
@@ -209,11 +222,11 @@
         }
 
         .message-line.sent .message-sender {
-            color: #1C2833; /* Dark text on gold */
+            color: #1C2833; 
         }
 
         .message-line.received .message-sender {
-            color: #1C2833; /* Dark text on white */
+            color: #1C2833; 
         }
 
 
@@ -243,7 +256,7 @@
         }
 
         .send-button {
-            background: #1C2833; /* Dark Navy Button */
+            background: #1C2833; 
             color: #FFFFFF;
             border: none;
             width: 45px;
@@ -266,6 +279,80 @@
             transform: scale(0.95);
         }
 
+        /* ======================================= */
+        /* --- MOBILE RESPONSIVE STYLES (max-width: 600px) --- */
+        /* ======================================= */
+        @media (max-width: 600px) {
+            
+            /* 1. Chat Container becomes Parent Container (Full Screen) */
+            .chat-container {
+                width: 100vw; /* Full width */
+                max-width: 100vw;
+                height: 100vh; /* Full height for mobile experience */
+                border-radius: 0; /* Remove border radius for full screen look */
+                box-shadow: none; /* Remove shadow */
+            }
+
+            /* 2. Auth Area Stacked (Single Column) */
+            .auth-area {
+                flex-direction: column; /* Stack cards vertically */
+                padding: 20px;
+                overflow-y: auto; /* Allow scrolling if content overflows */
+            }
+
+            /* 3. Auth Cards Styling */
+            .auth-card {
+                max-width: 100%; /* Take full available width */
+                margin: 15px 0; /* Add space between stacked cards */
+                padding: 25px;
+            }
+
+            /* 4. Chat Header Compact */
+            .chat-header {
+                padding: 10px 15px; /* Reduce padding */
+            }
+
+            .chat-header h4 {
+                font-size: 16px; /* Smaller title */
+                margin-right: 10px;
+            }
+
+            .user-info {
+                font-size: 12px;
+                /* Displaying only the first part of email for space */
+                display: none; 
+            }
+
+            .logout-button {
+                padding: 6px 12px; /* Smaller button */
+                font-size: 11px;
+            }
+
+            /* 5. Messages Area */
+            #messages {
+                padding: 15px; /* Reduced padding */
+            }
+
+            .message-line {
+                max-width: 90%; /* Messages can take more width */
+            }
+
+            /* 6. Chat Input Compact */
+            .chat-input {
+                padding: 10px 15px; /* Reduced padding */
+            }
+
+            .chat-input input {
+                padding: 10px 15px; /* Smaller input field */
+                margin-right: 10px;
+            }
+
+            .send-button {
+                width: 40px; /* Smaller send button */
+                height: 40px;
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -381,7 +468,17 @@
             if (user) {
                 authArea.style.display = 'none';
                 chatArea.style.display = 'flex';
-                userEmailSpan.textContent = user.email;
+                // Check if we are on a small screen
+                if (window.innerWidth > 600) {
+                     userEmailSpan.textContent = user.email;
+                } else {
+                    // Mobile: Show only the part before '@'
+                    userEmailSpan.textContent = user.email.split('@')[0];
+                    // Display only the first part of email in header on mobile
+                    const userInfoDiv = document.querySelector('.chat-header .user-info');
+                    userInfoDiv.textContent = 'User: ' + user.email.split('@')[0];
+                }
+
                 listenMessages(user); // Start listening messages
             } else {
                 authArea.style.display = 'flex';
