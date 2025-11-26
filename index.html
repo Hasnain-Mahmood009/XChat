@@ -415,167 +415,135 @@
 
     </div>
 
-    <script type="module">
-        // 🔹 Firebase imports (from your code)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-        
-        // 🔹 Firebase config (from your code)
-        const firebaseConfig = {
-            apiKey: "AIzaSyA5daFUKCFePdkZ1Zn1YmhAk39bHu0A6UM",
-            authDomain: "newchatapp-e7614.firebaseapp.com",
-            projectId: "newchatapp-e7614",
-            storageBucket: "newchatapp-e7614.firebasestorage.app",
-            messagingSenderId: "122269204382",
-            appId: "1:122269204382:web:feac24c3b6f2f2ca9b608f"
-        };
-        
-        // 🔹 Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        // --- HTML Element References ---
-        const authArea = document.getElementById('authArea');
-        const chatArea = document.getElementById('chatArea');
-        const messagesDiv = document.getElementById('messages');
-        const userEmailSpan = document.getElementById('userEmail');
-        const messageInput = document.getElementById('messageInput');
+  <script type="module">
+  // Firebase v12 Module
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+  import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-messaging.js";
 
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyA5daFUKCFePdkZ1Zn1YmhAk39bHu0A6UM",
+    authDomain: "newchatapp-e7614.firebaseapp.com",
+    projectId: "newchatapp-e7614",
+    storageBucket: "newchatapp-e7614.firebasestorage.app",
+    messagingSenderId: "122269204382",
+    appId: "1:122269204382:web:feac24c3b6f2f2ca9b608f"
+  };
 
-        // 🔹 Signup function
-        window.signup = function() {
-            const email = document.getElementById("signupEmail").value;
-            const password = document.getElementById("signupPassword").value;
-            if (password.length < 6) {
-                alert("Password should be at least 6 characters.");
-                return;
-            }
-            createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                // UI automatically switches via onAuthStateChanged
-            })
-            .catch((error) => {
-                alert("Signup Error: " + error.message);
-            });
-        }
-        
-        // 🔹 Login function
-        window.login = function() {
-            const email = document.getElementById("loginEmail").value;
-            const password = document.getElementById("loginPassword").value;
-            signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                // UI automatically switches via onAuthStateChanged
-            })
-            .catch((error) => {
-                alert("Login Error: " + error.message);
-            });
-        }
-        
-        // 🔹 Logout function
-        window.logout = function() {
-            auth.signOut();
-        }
-        
-        // 🔹 Show chat area after login
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                authArea.style.display = 'none';
-                chatArea.style.display = 'flex';
-                // Check if we are on a small screen
-                if (window.innerWidth > 600) {
-                     userEmailSpan.textContent = user.email;
-                } else {
-                    // Mobile: Show only the part before '@'
-                    userEmailSpan.textContent = user.email.split('@')[0];
-                    // Display only the first part of email in header on mobile
-                    const userInfoDiv = document.querySelector('.chat-header .user-info');
-                    userInfoDiv.textContent = 'User: ' + user.email.split('@')[0];
-                }
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const messaging = getMessaging(app);
 
-                listenMessages(user); // Start listening messages
-            } else {
-                authArea.style.display = 'flex';
-                chatArea.style.display = 'none';
-                userEmailSpan.textContent = 'Guest';
-                messagesDiv.innerHTML = ''; // Clear messages when logged out
-            }
-        });
-        
-        // 🔹 Send message function
-        window.sendMessage = async function() {
-            const text = messageInput.value.trim();
-            if (!text) return;
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Please log in to send a message.");
-                messageInput.value = '';
-                return;
-            }
+  // HTML Elements
+  const authArea = document.getElementById('authArea');
+  const chatArea = document.getElementById('chatArea');
+  const messagesDiv = document.getElementById('messages');
+  const userEmailSpan = document.getElementById('userEmail');
+  const messageInput = document.getElementById('messageInput');
 
-            try {
-                await addDoc(collection(db, 'messages'), {
-                    text,
-                    sender: user.email,
-                    createdAt: serverTimestamp()
-                });
-                messageInput.value = '';
-            } catch (error) {
-                 alert("Error sending message: " + error.message);
-            }
-        }
-        
-        // 🔹 Listen messages in realtime (Updated to use premium UI styles)
-        function listenMessages(currentUser) {
-            const q = query(collection(db, 'messages'), orderBy('createdAt', 'asc'));
-            
-            // Clear previous listener if any, though onSnapshot handles updates naturally
-            onSnapshot(q, snapshot => {
-                messagesDiv.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const m = doc.data();
-                    
-                    const messageLine = document.createElement('div');
-                    messageLine.classList.add('message-line');
+  // Signup
+  window.signup = function() {
+    const email = document.getElementById("signupEmail").value;
+    const password = document.getElementById("signupPassword").value;
+    if(password.length < 6){ alert("Password should be at least 6 characters."); return; }
+    createUserWithEmailAndPassword(auth,email,password)
+      .catch(error => alert("Signup Error: " + error.message));
+  }
 
-                    const messageContent = document.createElement('div');
-                    messageContent.classList.add('message-content');
-                    
-                    const senderSpan = document.createElement('span');
-                    senderSpan.classList.add('message-sender');
-                    
-                    const messageText = document.createTextNode(m.text);
-                    
-                    // Determine if the message is sent by the current user
-                    if (m.sender === currentUser.email) {
-                        messageLine.classList.add('sent');
-                        senderSpan.textContent = 'You';
-                    } else {
-                        messageLine.classList.add('received');
-                        // Display only the part before '@'
-                        senderSpan.textContent = m.sender ? m.sender.split('@')[0] : 'Unknown';
-                    }
-                    
-                    messageContent.appendChild(senderSpan);
-                    messageContent.appendChild(messageText);
-                    messageLine.appendChild(messageContent);
-                    messagesDiv.appendChild(messageLine);
-                });
-                // Auto scroll to the latest message
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            });
-        }
-        
-    </script>
-    <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(reg => console.log("Service Worker registered"))
-    .catch(err => console.log("Service Worker failed", err));
-}
+  // Login
+  window.login = function() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    signInWithEmailAndPassword(auth,email,password)
+      .catch(error => alert("Login Error: " + error.message));
+  }
+
+  // Logout
+  window.logout = function() { auth.signOut(); }
+
+  // Auth state change
+  auth.onAuthStateChanged(user => {
+    if(user){
+      authArea.style.display = 'none';
+      chatArea.style.display = 'flex';
+      userEmailSpan.textContent = user.email.split('@')[0];
+      listenMessages(user);
+    } else {
+      authArea.style.display = 'flex';
+      chatArea.style.display = 'none';
+      userEmailSpan.textContent = 'Guest';
+      messagesDiv.innerHTML = '';
+    }
+  });
+
+  // Send message
+  window.sendMessage = async function(){
+    const text = messageInput.value.trim();
+    if(!text) return;
+    const user = auth.currentUser;
+    if(!user){ alert("Please log in to send a message."); messageInput.value=''; return; }
+    try{
+      await addDoc(collection(db,'messages'),{
+        text,
+        sender: user.email,
+        createdAt: serverTimestamp()
+      });
+      messageInput.value='';
+    } catch(error){ alert("Error sending message: " + error.message); }
+  }
+
+  // Listen messages
+  function listenMessages(currentUser){
+    const q = query(collection(db,'messages'),orderBy('createdAt','asc'));
+    onSnapshot(q,snapshot=>{
+      messagesDiv.innerHTML='';
+      snapshot.forEach(doc=>{
+        const m = doc.data();
+        const line = document.createElement('div');
+        line.classList.add('message-line');
+        const content = document.createElement('div');
+        content.classList.add('message-content');
+        const sender = document.createElement('span');
+        sender.classList.add('message-sender');
+        const textNode = document.createTextNode(m.text);
+        if(m.sender === currentUser.email){ line.classList.add('sent'); sender.textContent='You'; }
+        else{ line.classList.add('received'); sender.textContent=m.sender ? m.sender.split('@')[0] : 'Unknown'; }
+        content.appendChild(sender);
+        content.appendChild(textNode);
+        line.appendChild(content);
+        messagesDiv.appendChild(line);
+      });
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+  }
+
+  // Firebase Messaging
+  async function initFCM(){
+    try {
+      // Register service worker
+      const swRegistration = await navigator.serviceWorker.register('sw.js');
+      console.log("Service Worker Registered!");
+
+      // Get token
+      const token = await getToken(messaging, { vapidKey: "BHSZPDYXRREioLWrA3rVtyya85rKlW5_fg3PaGaWV5mKFoJtNjGvFzyVCVDfNyEQmFMvML83patB44EdZDcK10s", serviceWorkerRegistration: swRegistration });
+      console.log("Device Token:", token);
+    } catch(err){
+      console.log("FCM Error:", err);
+    }
+  }
+
+  initFCM();
+
+  // Foreground messages
+  onMessage(messaging, payload => console.log("Foreground Message:", payload));
+
 </script>
+
+
 
 </body>
 </html>
